@@ -427,6 +427,15 @@
         document.addEventListener('DOMContentLoaded', calculateForecast);
     </script>
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".current-year").forEach(function(el) {
+            el.textContent = new Date().getFullYear();
+        });
+    });
+</script>
+
 </body>
 
 <br>
