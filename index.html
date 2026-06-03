@@ -426,6 +426,13 @@
         // Calcolo iniziale al caricamento della pagina
         document.addEventListener('DOMContentLoaded', calculateForecast);
     </script>
+
+<script>
+    document.querySelectorAll(".current-year").forEach(function(el) {
+        el.textContent = new Date().getFullYear();
+    });
+</script>
+
 </body>
 
 <br>
@@ -436,6 +443,6 @@
     </div>
 
 <footer>
-            <p>Simulatore Previsione CPC gratuito di <a href="https://www.gabrieleviola.it">Gabriele Viola</a>&copy; 2025 - I dati vengono elaborati localmente nel browser e non vengono salvati o trasmessi da questo tool</p> 
+            <p>Simulatore Previsione CPC gratuito di <a href="https://www.gabrieleviola.it">Gabriele Viola</a>&copy; <span class="current-year"></span> - I dati vengono elaborati localmente nel browser e non vengono salvati o trasmessi da questo tool</p> 
         </footer>
 </html>
