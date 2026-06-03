@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Previsione Pubblicitaria</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --warning-color: #e74c3c;
+            --neutral-color: #f39c12;
+            --light-bg: #f5f7fa;
+            --dark-text: #2c3e50;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+            color: var(--dark-text);
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: var(--light-bg);
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .positive {
+            color: var(--secondary-color);
+        }
+        
+        .neutral {
+            color: var(--neutral-color);
+        }
+        
+        .negative {
+            color: var(--warning-color);
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .confidence-intervals {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .interval {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            margin: 0 5px;
+        }
+        
+        .interval-positive {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .interval-neutral {
+            background-color: rgba(243, 156, 18, 0.2);
+            border-left: 4px solid var(--neutral-color);
+        }
+        
+        .interval-negative {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <div class="card">
+                <h1>Simulatore Previsione Pubblicitaria</h1>
+                <p>Inserisci i parametri per simulare le prestazioni della tua campagna pubblicitaria.</p>
+                
+                <div class="input-group">
+                    <label for="budget">Budget (€)</label>
+                    <input type="number" id="budget" value="1000" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="impressions">Impressions</label>
+                    <input type="number" id="impressions" value="50000" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="clicks">Clic</label>
+                    <input type="number" id="clicks" value="2500" min="0">
+                </div>
+                
+                <button id="calculate">Calcola Previsioni</button>
+            </div>
+            
+            <div class="card">
+                <h2>Risultati</h2>
+                <div class="results">
+                    <div class="result-card">
+                        <h3>CPC Medio</h3>
+                        <div class="result-value" id="cpc">€0.40</div>
+                        <p>Costo per Click</p>
+                    </div>
+                    <div class="result-card">
+                        <h3>CTR</h3>
+                        <div class="result-value" id="ctr">5.0%</div>
+                        <p>Click-Through Rate</p>
+                    </div>
+                </div>
+                
+                <h3>Intervalli di Confidenza</h3>
+                <div class="confidence-intervals">
+                    <div class="interval interval-positive">
+                        <h4>Scenario Positivo</h4>
+                        <div class="result-value positive" id="positive-cpc">€0.32</div>
+                        <p>Costo per Click</p>
+                    </div>
+                    <div class="interval interval-neutral">
+                        <h4>Scenario Neutro</h4>
+                        <div class="result-value neutral" id="neutral-cpc">€0.40</div>
+                        <p>Costo per Click</p>
+                    </div>
+                    <div class="interval interval-negative">
+                        <h4>Scenario Negativo</h4>
+                        <div class="result-value negative" id="negative-cpc">€0.48</div>
+                        <p>Costo per Click</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="card">
+                <h2>Previsioni nel Tempo</h2>
+                <div class="chart-container">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Dettaglio Previsioni</h2>
+                <div class="table-container">
+                    <table id="forecastTable">
+                        <thead>
+                            <tr>
+                                <th>Mese</th>
+                                <th>Scenario Positivo</th>
+                                <th>Scenario Neutro</th>
+                                <th>Scenario Negativo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- I dati verranno inseriti dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="vendor/chart.umd.min.js"></script>
+    <script>
+        // Elementi DOM
+        const budgetInput = document.getElementById('budget');
+        const impressionsInput = document.getElementById('impressions');
+        const clicksInput = document.getElementById('clicks');
+        const calculateButton = document.getElementById('calculate');
+        
+        const cpcElement = document.getElementById('cpc');
+        const ctrElement = document.getElementById('ctr');
+        const positiveCpcElement = document.getElementById('positive-cpc');
+        const neutralCpcElement = document.getElementById('neutral-cpc');
+        const negativeCpcElement = document.getElementById('negative-cpc');
+        
+        const forecastTable = document.getElementById('forecastTable').getElementsByTagName('tbody')[0];
+        
+        // Inizializzazione del grafico
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        let forecastChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+                datasets: [
+                    {
+                        label: 'Scenario Positivo',
+                        data: [],
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Scenario Neutro',
+                        data: [],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Scenario Negativo',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Previsione CPC Mensile (€)'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Costo per Click (€)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Calcolo delle previsioni
+        function calculateForecast() {
+            const budget = parseFloat(budgetInput.value);
+            const impressions = parseInt(impressionsInput.value);
+            const clicks = parseInt(clicksInput.value);
+            
+            // Calcolo CPC medio
+            const cpc = budget / clicks;
+            cpcElement.textContent = `€${cpc.toFixed(2)}`;
+            
+            // Calcolo CTR
+            const ctr = (clicks / impressions) * 100;
+            ctrElement.textContent = `${ctr.toFixed(1)}%`;
+            
+            // Calcolo intervalli di confidenza
+            const positiveCpc = cpc * 0.8; // -20%
+            const neutralCpc = cpc;        // invariato
+            const negativeCpc = cpc * 1.2; // +20%
+            
+            positiveCpcElement.textContent = `€${positiveCpc.toFixed(2)}`;
+            neutralCpcElement.textContent = `€${neutralCpc.toFixed(2)}`;
+            negativeCpcElement.textContent = `€${negativeCpc.toFixed(2)}`;
+            
+            // Generazione dati per il grafico
+            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+            const positiveData = [];
+            const neutralData = [];
+            const negativeData = [];
+            
+            // Aggiungiamo una variazione casuale mensile per rendere il grafico più realistico
+            for (let i = 0; i < 12; i++) {
+                // Variazione mensile casuale tra -5% e +5%
+                const monthlyVariation = 1 + (Math.random() * 0.1 - 0.05);
+                
+                positiveData.push(positiveCpc * monthlyVariation);
+                neutralData.push(neutralCpc * monthlyVariation);
+                negativeData.push(negativeCpc * monthlyVariation);
+            }
+            
+            // Aggiornamento del grafico
+            forecastChart.data.datasets[0].data = positiveData;
+            forecastChart.data.datasets[1].data = neutralData;
+            forecastChart.data.datasets[2].data = negativeData;
+            forecastChart.update();
+            
+            // Aggiornamento della tabella
+            updateForecastTable(months, positiveData, neutralData, negativeData);
+        }
+        
+        // Aggiornamento della tabella delle previsioni
+        function updateForecastTable(months, positiveData, neutralData, negativeData) {
+            // Svuota la tabella
+            forecastTable.innerHTML = '';
+            
+            // Aggiunge le righe con i dati
+            for (let i = 0; i < months.length; i++) {
+                const row = forecastTable.insertRow();
+                
+                const monthCell = row.insertCell(0);
+                monthCell.textContent = months[i];
+                
+                const positiveCell = row.insertCell(1);
+                positiveCell.textContent = `€${positiveData[i].toFixed(2)}`;
+                positiveCell.className = 'positive';
+                
+                const neutralCell = row.insertCell(2);
+                neutralCell.textContent = `€${neutralData[i].toFixed(2)}`;
+                neutralCell.className = 'neutral';
+                
+                const negativeCell = row.insertCell(3);
+                negativeCell.textContent = `€${negativeData[i].toFixed(2)}`;
+                negativeCell.className = 'negative';
+            }
+        }
+        
+        // Event listener per il pulsante di calcolo
+        calculateButton.addEventListener('click', calculateForecast);
+        
+        // Calcolo iniziale al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', calculateForecast);
+    </script>
+</body>
+
+<br>
+
+
+    <div style="max-width: 900px; margin: 30px auto; padding: 16px; background: #fff8e1; border-left: 4px solid #f0ad4e; border-radius: 8px;">
+        <strong>Disclaimer:</strong> questo strumento fornisce stime semplificate a scopo educativo e informativo. Non costituisce consulenza pubblicitaria, finanziaria o commerciale. CPC, CTR, costi e risultati reali possono variare in base a piattaforma, targeting, concorrenza, qualità degli annunci e condizioni di mercato.
+    </div>
+
+<footer>
+            <p>Simulatore Previsione CPC gratuito di <a href="https://www.gabrieleviola.it">Gabriele Viola</a>&copy; 2025 - I dati vengono elaborati localmente nel browser e non vengono salvati o trasmessi da questo tool</p> 
+        </footer>
+</html>
